@@ -1,0 +1,51 @@
+
+题目：使用KNN算法从下列购物数据中判断用户性别
+
+数据：'DataSetReadOnly/AItest_C_webshopping_10.csv'
+要求：某购物网站提供了以往的购物数据，请设计一个方法，从网络购物数据判断用户性别，并验证。
+1.读取数据集
+
+
+请在下方代码的基础上将<None>处代码补充完整。
+
+import pandas as pd#导入数据分析工具包pandas
+import numpy as np
+shopdata=<None>('DataSetReadOnly/AItest_C_webshopping_10.csv',encoding = 'gb2312')#利用pandas库打开.csv文件
+
+In [1]:
+
+#请在此处编写代码
+import pandas as pd#导入数据分析工具包pandas
+import numpy as np
+shopdata=pd.read_csv('DataSetReadOnly/AItest_C_webshopping_10.csv',encoding = 'gb2312')#利用pandas库打开.csv文件
+
+2.划分数据集
+In [2]:
+
+#请在此处编写代码
+shopdata=np.array(shopdata)
+train_data=shopdata[0:9]
+x_train=train_data[:,0:2]
+y_train=train_data[:,-1]
+
+
+test_data=shopdata[9]
+x_test=test_data[0:2]
+x_test=x_test.reshape(1,-1)
+y_test=test_data[-1]
+
+3.构造分类器
+In [3]:
+
+#请在此处编写代码
+
+#sklearn是python中的机器学习工具库，里面有分类、回归、聚类、降维、模型选择和预处理等模块
+from sklearn.neighbors import KNeighborsClassifier
+knn_clf = KNeighborsClassifier()
+
+knn_clf.fit(x_train,y_train)
+knn_clf.predict(x_test)
+
+Out [3]:
+
+array(['女'], dtype=object)

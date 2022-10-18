@@ -1,0 +1,53 @@
+
+题目
+
+按步骤要求完成RNN网络的构建。
+In [1]:
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense,Activation,SimpleRNN
+model=Sequential()
+
+1、向网络中增加SimpleRNN层
+
+要求：隐藏层神经元个数：16；激活函数：relu；输入张量的形状：（50,50）
+In [2]:
+
+#代码区
+model.add(SimpleRNN(16,activation='relu',input_shape=(50,50)))
+
+2、向网络中增加全连接层
+
+要求：隐藏层神经元个数：10；激活函数：softmax
+In [3]:
+
+#代码区
+model.add(Dense(10,Activation('softmax')))
+
+3、编译创建好的模型
+
+要求：损失函数：categorical_crossentropy；评价函数：accuracy
+In [4]:
+
+#代码区
+model.compile(loss='categorical_crossentropy',
+             metrics=['accuracy'])
+
+4、输出模型各层的参数状况
+In [5]:
+
+#代码区
+model.summary()
+
+Model: "sequential"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+simple_rnn (SimpleRNN)       (None, 16)                1072      
+_________________________________________________________________
+dense (Dense)                (None, 10)                170       
+=================================================================
+Total params: 1,242
+Trainable params: 1,242
+Non-trainable params: 0
+_________________________________________________________________

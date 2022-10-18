@@ -1,0 +1,52 @@
+
+请根据要求逐步完成代码填空
+1、提取文本关键词，并输出关键词在每个句子中对应的词频
+In [1]:
+
+from sklearn.feature_extraction.text import CountVectorizer 
+from sklearn.feature_extraction.text import TfidfTransformer
+#语料  
+corpus = [  
+    '这 是 第一个 文档 。',  
+    '这 是 第二个 文档 。',  
+    '这 是 第三个 。',  
+    '请问 一共 有 几个 文档 ？',  
+]  
+
+In [2]:
+
+#代码区
+vectorizer = CountVectorizer()  
+X = vectorizer.fit_transform(corpus)  
+#获取词袋中所有文本关键词  
+word = vectorizer.get_feature_names()  
+print(word)  
+print(X.toarray())
+
+['一共', '几个', '文档', '第一个', '第三个', '第二个', '请问']
+[[0 0 1 1 0 0 0]
+ [0 0 1 0 0 1 0]
+ [0 0 0 0 1 0 0]
+ [1 1 1 0 0 0 1]]
+
+2、输出句子中每个词的TF-IDF值
+In [3]:
+
+#代码区
+transformer = TfidfTransformer()  
+print(transformer)  
+tfidf = transformer.fit_transform(X)   
+print(tfidf.toarray())
+
+TfidfTransformer()
+[[0.         0.         0.53802897 0.84292635 0.         0.
+  0.        ]
+ [0.         0.         0.53802897 0.         0.         0.84292635
+  0.        ]
+ [0.         0.         0.         0.         1.         0.
+  0.        ]
+ [0.5417361  0.5417361  0.34578314 0.         0.         0.
+  0.5417361 ]]
+
+In [ ]:
+

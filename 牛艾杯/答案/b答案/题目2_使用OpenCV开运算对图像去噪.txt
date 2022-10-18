@@ -1,0 +1,15 @@
+!unrar x -inul -y DataSetReadOnly/opencv数据集.rar ./
+
+In [2]:
+
+import cv2 as cv
+import numpy as np
+from matplotlib import pyplot as plt
+img = cv.imread('./opencv数据集/char2.jpg',0)
+kernel = np.ones((5,5),np.uint8)
+opening = cv.morphologyEx(img, cv.MORPH_OPEN, kernel)
+plt.subplot(121),plt.imshow(img,plt.cm.gray),plt.title('Original')
+plt.xticks([]), plt.yticks([])
+plt.subplot(122),plt.imshow(opening,plt.cm.gray),plt.title('open')
+plt.xticks([]), plt.yticks([])
+plt.show()

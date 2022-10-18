@@ -1,0 +1,135 @@
+
+题目：将代码中的缺失部分填充完整。
+
+在初始化参数 theta 中，你会看到如 下的代码： theta = None 这里，大家只需要删除赋值等式右边的 None，修改为自己编写的表达式即可。
+
+K-means
+
+我们将实现K-means聚类，并使用它来压缩图像。 我们将从一个简单的2D数据集开始，以了解K-means是如何工作的。
+K-means 聚类
+
+我们将实施和应用K-means到一个简单的二维数据集，以获得一些直观的工作原理。 K-means是一个迭代的，无监督的聚类算法，将类似的实例组合成簇。 该算法通过猜测每个簇的初始聚类中心开始，然后重复将实例分配给最近的簇，并重新计算该簇的聚类中心。 我们要实现的第一部分是找到数据中每个实例最接近的聚类中心的函数。
+In [1]
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sb
+from scipy.io import loadmat
+
+In [2]
+
+def find_closest_centroids(X, centroids)
+# INPUT：数据X，初始聚类中心centroids
+# OUTPUT：距离聚类中心最近的数据索引
+# TODO：找到数据中每个实例最接近的聚类中心的数据
+    
+    # STEP1：得到矩阵的维度，初始化矩阵
+    m = X.shape[0]
+    k = centroids.shape[0]
+    idx = np.zeros(m)
+    
+    # STEP2：遍历所有数据，找到距离聚类中心最近的
+    # your code here  (appro ~ 3 lines)
+    for i in range(m)
+        min_dist = 1000000
+        for j in range(k)
+            dist = np.sum((X[i,] - centroids[j,])2)
+            if dist  min_dist
+                min_dist = dist
+                idx[i] = j
+             
+    return idx
+
+让我们来测试这个函数，以确保它的工作正常。 我们将使用练习中提供的测试用例。
+In [4]
+
+data = loadmat('.DataSetReadOnlyex7data2.mat')
+X = data['X']
+initial_centroids = initial_centroids = np.array([[3, 3], [6, 2], [8, 5]])
+
+idx = find_closest_centroids(X, initial_centroids)
+idx[03]
+
+Out [4]
+
+array([0., 2., 1.])
+
+输出与文本中的预期值匹配（记住我们的数组是从零开始索引的，而不是从一开始索引的，所以值比练习中的值低一个）。 接下来，我们需要一个函数来计算簇的聚类中心。 聚类中心只是当前分配给簇的所有样本的平均值。
+In [5]
+
+data2 = pd.DataFrame(data.get('X'), columns=['X1', 'X2'])
+data2.head()
+
+Out [5]
+In [6]
+
+sb.set(context=notebook, style=white)
+sb.lmplot('X1', 'X2', data=data2, fit_reg=False)
+plt.show()
+
+In [7]
+
+def compute_centroids(X, idx, k)
+# INPUT：数据X，聚类中心idx，簇的个数k
+# OUTPUT：当前簇的聚类中心
+# TODO：计算当前簇的聚类中心
+    # STEP1：得到矩阵大小，初始化矩阵
+    m, n = X.shape
+    centroids = np.zeros((k, n))
+    
+    # STEP2：计算聚类中心
+    # your code here  (appro ~ 2 lines)
+    for i in range(k)
+        indices = np.where(idx == i)
+        centroids[i,] = (np.sum(X[indices,], axis=1)  len(indices[0])).ravel()
+    return centroids
+
+In [8]
+
+compute_centroids(X, idx, 3)
+
+Out [8]
+
+array([[2.42830111, 3.15792418],
+       [5.81350331, 2.63365645],
+       [7.11938687, 3.6166844 ]])
+
+如果你的答案正确，这里的输出应该是： array([[ 2.42830111, 3.15792418], [ 5.81350331, 2.63365645], [ 7.11938687, 3.6166844 ]])
+
+下一部分涉及实际运行该算法的一些迭代次数和可视化结果。 这个步骤是由于并不复杂，我将从头开始构建它。 为了运行算法，我们只需要在将样本分配给最近的簇并重新计算簇的聚类中心。
+In [11]
+
+def run_k_means(X, initial_centroids, max_iters)
+# INPUT：数据X，聚类中心idx，簇的个数k
+# OUTPUT：当前簇的聚类中心
+# TODO：计算当前簇的聚类中心
+    # STEP1：得到矩阵大小，初始化矩阵级变量
+    m, n = X.shape
+    k = initial_centroids.shape[0]
+    idx = np.zeros(m)
+    centroids = initial_centroids
+    # STEP2：实施聚类算法，调用之前的两个函数
+    # your code here  (appro ~ 2 lines)    
+    for i in range(max_iters)
+        idx = find_closest_centroids(X, centroids)
+        centroids = compute_centroids(X, idx, k)
+    
+    return idx, centroids
+
+In [12]
+
+idx, centroids = run_k_means(X, initial_centroids, 10)
+cluster1 = X[np.where(idx == 0)[0],]
+cluster2 = X[np.where(idx == 1)[0],]
+cluster3 = X[np.where(idx == 2)[0],]
+
+fig, ax = plt.subplots(figsize=(12,8))
+ax.scatter(cluster1[,0], cluster1[,1], s=30, color='r', label='Cluster 1')
+ax.scatter(cluster2[,0], cluster2[,1], s=30, color='g', label='Cluster 2')
+ax.scatter(cluster3[,0], cluster3[,1], s=30, color='b', label='Cluster 3')
+ax.legend()
+plt.show()
+
+In [ ]
+

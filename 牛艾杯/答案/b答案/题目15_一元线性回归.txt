@@ -1,0 +1,165 @@
+
+题目：请根据步骤要求完成对指定数据的线性回归拟合。
+1. 构造数据集
+
+通过numpy构造一组数据，20个数据点，每个数据点包含1个维度特征，用x表示特征，y表示目标值。
+请在下方代码的基础上将<None>处代码补充完整。
+
+from numpy import *
+<None>
+X0 = ones((m, 1))
+X1 = arange(1, m+1).reshape(m, 1)
+X = hstack((X0, X1))
+Y = array([
+    1, 4, 5, 5, 4, 4, 7, 8, 11, 8, 12,
+    11, 13, 13, 16, 15, 14, 16, 16, 20
+]).reshape(m, 1)
+
+In [1]:
+
+#请在此处编写上面的代码，并将<None>处代码补充完整
+from numpy import *
+m = 20
+X0 = ones((m, 1))
+X1 = arange(1, m+1).reshape(m, 1)
+X = hstack((X0, X1))
+# 对应的y坐标
+Y = array([
+    1, 4, 5, 5, 4, 4, 7, 8, 11, 8, 12,
+    11, 13, 13, 16, 15, 14, 16, 16, 20
+]).reshape(m, 1)
+
+2. 数据可视化
+
+将20个数据点在2维界面展示出来，画出红色散点图。
+请在下方代码的基础上将<None>处代码补充完整。
+
+import matplotlib.pyplot as plt
+def plot1(X, Y):
+    ax = plt.subplot(111)  
+    <None>
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.show()
+plot1(X1,Y)
+
+In [2]:
+
+#请在此处编写上面的代码，并将<None>处代码补充完整
+import matplotlib.pyplot as plt
+def plot1(X, Y):
+    ax = plt.subplot(111)  
+    ax.scatter(X, Y, s=30, c="red", marker="s")
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.show()
+plot1(X1,Y)
+
+3. 定义损失函数
+
+要求：使用均方差损失函数J=∑i=1m(yi−(wxi+b))22mJ =\frac{\sum_{i=1}^m{(y_i-(wx_i+b))}^2}{2m}J=2m∑i=1m​(yi​−(wxi​+b))2​。
+请在下方代码的基础上将<None>处代码补充完整。
+
+def cost_function(theta, X, Y):
+    #dot函数返回的是两个数的点积
+    diff = dot(X, theta) - Y 
+    <None>
+    return costs
+
+In [3]:
+
+#请在此处编写上面的代码，并将<None>处代码补充完整
+
+def cost_function(theta, X, Y):
+    diff = dot(X, theta) - Y  
+    costs = (1/(2*m)) * dot(diff.transpose(), diff)
+    return costs
+
+4. 定义梯度下降过程
+
+定义均方误差损失函数对应的梯度函数以及梯度下降迭代过程。
+请在下方代码的基础上将<None>处代码补充完整。
+
+def gradient_function(theta, X, Y):
+    <None>
+    return (1/m) * dot(X.transpose(), diff)
+
+def gradient_descent(X, Y, alpha,door):
+    theta = array([1, 1]).reshape(2, 1)
+    gradient = gradient_function(theta, X, Y)
+    while not all(abs(gradient) <= door):
+        <None>
+        <None>
+    return theta
+
+In [4]:
+
+#请在此处编写上面的代码，并将<None>处代码补充完整
+def gradient_function(theta, X, Y):
+    diff = dot(X, theta) - Y
+    return (1/m) * dot(X.transpose(), diff)
+def gradient_descent(X, Y, alpha,door):
+    theta = array([1, 1]).reshape(2, 1)
+    gradient = gradient_function(theta, X, Y)
+    while not all(abs(gradient) <= door):
+        theta = theta - alpha * gradient
+        gradient = gradient_function(theta, X, Y)
+    return theta
+
+5. 训练模型并输出模型参数和损失值
+
+
+请在下方代码的基础上将<None>处代码补充完整。
+
+alpha = 0.001
+door = 1e-5
+<None>
+print('optimal:\n', optimal)
+print('cost function:', cost_function(optimal, X, Y)[0][0])
+
+In [5]:
+
+#请在此处编写上面的代码，并将<None>处代码补充完整
+
+alpha = 0.001
+door = 1e-5
+optimal = gradient_descent(X, Y, alpha,door)
+print('optimal:\n', optimal)
+print('cost function:', cost_function(optimal, X, Y)[0][0])
+
+optimal:
+ [[1.09469346]
+ [0.86240919]]
+cost function: 0.8490037596165344
+
+6. 绘制回归线
+
+要求：真实数据以红色散点图展示，拟合线用蓝色直线展示。
+请在下方代码的基础上将<None>处代码补充完整。
+
+def plot(X, Y, theta):
+    ax = plt.subplot(111)  
+    <None>
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    x = arange(0, 21, 0.2)  # x的范围
+    y = theta[0] + theta[1]*x
+    ax.plot(x, y)
+    plt.show()
+plot(X1, Y, optimal)
+
+In [6]:
+
+#请在此处编写上面的代码，并将<None>处代码补充完整
+
+def plot(X, Y, theta):
+    ax = plt.subplot(111)  
+    ax.scatter(X, Y, s=30, c="red", marker="s")
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    x = arange(0, 21, 0.2)  # x的范围
+    y = theta[0] + theta[1]*x
+    ax.plot(x, y)
+    plt.show()
+plot(X1, Y, optimal)
+

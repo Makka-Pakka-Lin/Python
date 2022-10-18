@@ -1,0 +1,43 @@
+
+题目
+
+请根据步骤要求完成特征选择。
+In [1]:
+
+from sklearn.datasets import load_iris
+iris = load_iris()
+
+1、请输出上述鸢尾花数据的shape
+In [2]:
+
+#代码区
+print('原始数据维度：')
+print(iris.data.shape)
+
+原始数据维度：
+(150, 4)
+
+2、import特征选择、卡方检验
+
+提示：sklearn.feature_selection
+In [3]:
+
+#代码区
+from sklearn.feature_selection import SelectKBest,chi2
+
+3、通过卡方检验移除top2以外的特征
+In [4]:
+
+#代码区
+skb = SelectKBest(chi2,k=2)
+new_data = skb.fit_transform(iris.data,iris.target)
+
+4、请输出特征选择后数据的shape
+In [5]:
+
+#代码区
+print('特征选择后维度：')
+print(new_data.shape)
+
+特征选择后维度：
+(150, 2)

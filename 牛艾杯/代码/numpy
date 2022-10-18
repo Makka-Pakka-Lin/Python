@@ -1,0 +1,18 @@
+----------------------------------numpy----------------------------------------
+
+	1.ndarray数组
+		ndarray数组支持矢量化运算
+			import numpy as np
+			
+			ary = np.array([1,2,3,4,5,6])
+			prinf(ary * 2)
+				#[2,4,6,8,10,12]
+			prinf(ary + ary)
+				#[2,4,6,8,10,12]将两个数组的元素一一相加
+			prinf(ary > 2)
+				#[False False True True True True]
+			prinf(ary * ary)
+				#[1,4,9,16,25,36]
+				
+				
+				

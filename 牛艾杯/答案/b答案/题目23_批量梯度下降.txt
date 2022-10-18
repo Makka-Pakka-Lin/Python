@@ -1,0 +1,98 @@
+
+题目：将代码中标注# your code here 的部分补充完整
+In [25]:
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+ 
+ 
+path =  './DataSetReadOnly/ex1data1.txt'
+data = pd.read_csv(path, header=None, names=['Population', 'Profit'])
+#print(data.head())
+#print(data.describe())
+ 
+ 
+data.plot(kind='scatter', x='Population', y='Profit', figsize=(9,5))
+#plt.show()
+ 
+def computeCost(X, y, theta):
+    inner = np.power(((X * theta.T) - y), 2)
+    return np.sum(inner) / (2 * len(X))
+ 
+data.insert(0, 'Ones', 1)#在最前列插入名为'Ones'，值为1的列
+#print(data.head())
+ 
+#set X (trainning data) and y (target variable)
+cols = data.shape[1]
+X = data.iloc[:,0:cols-1]#x是所有行，去掉最后一列
+y = data.iloc[:,cols-1:cols]#y是所有行，最后一列
+ 
+#print(x.head())
+#print(y.head())
+ 
+X = np.matrix(X.values)
+y = np.matrix(y.values)
+theta = np.matrix(np.array([0,0]))
+ 
+#print(theta)
+#print(X.shape)
+#print(theta.shape)
+#print(y.shape)
+ 
+a = computeCost(X, y, theta)
+print(a)
+ 
+#批量梯度下降
+def gradientDescent(X, y, theta, alpha, iters):
+    temp = np.matrix(np.zeros(theta.shape))#初始化一个（1，2）的0矩阵
+    parameters = int(theta.ravel().shape[1])#参数theta的数量
+    cost = np.zeros(iters)#初始化一个array,包含每次iters的cost
+ 
+    for i in range(iters):
+        error = (X * theta.T) - y
+ 
+        for j in range(parameters):
+            term = np.multiply(error, X[:,j])
+            temp[0,j] = theta[0,j] - ((alpha / len(X)) * np.sum(term))
+ 
+        theta = temp
+        cost[i] = computeCost(X, y, theta)
+ 
+    return theta, cost
+ 
+alpha = 0.01
+iters = 1000
+ 
+g, cost = gradientDescent(X, y, theta, alpha, iters)
+print(g)
+delt = computeCost(X, y, g)
+print(delt)
+ 
+ 
+x = np.linspace(data.Population.min(), data.Population.max(), 100)#横坐标
+f = g[0, 0] + (g[0, 1] * x)#纵坐标，利润
+ 
+fig, ax = plt.subplots(figsize=(9,5))
+ 
+ax.plot(x, f, 'r', label='Prediction')
+ax.scatter(data.Population, data.Profit, label='Tranning Data')
+ax.legend(loc=2)#2表示在左上角
+ax.set_xlabel('Population')
+ax.set_ylabel('Profit')
+ax.set_title('Predicted Profit over Population Size')
+ 
+ 
+ 
+fig, ax = plt.subplots(figsize=(9,5))
+ax.plot(np.arange(iters), cost, 'r')
+ax.set_xlabel('Iterations')
+ax.set_ylabel('Cost')
+ax.set_title('Error vs. Trainning data')
+plt.show()
+
+32.072733877455676
+[[-3.24140214  1.1272942 ]]
+4.515955503078912
+

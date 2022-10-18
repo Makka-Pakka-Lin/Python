@@ -1,0 +1,104 @@
+
+题目
+
+使用下面步骤中给定的数据，并通过sklearn中的DecisionTreeClassifier实现决策树剪枝过程。
+In [1]:
+
+# 生成数据集，二维数据点
+import numpy as np
+from sklearn.tree import DecisionTreeClassifier
+import matplotlib.pyplot as plt
+from sklearn import datasets
+from matplotlib.colors import ListedColormap  
+X,y = datasets.make_moons(noise=0.25,random_state=666)
+plt.scatter(X[y==0,0],X[y==0,1])
+plt.scatter(X[y==1,0],X[y==1,1])
+plt.show()
+
+1、使用以上数据训练决策树模型
+
+要求：使用默认参数配置
+In [3]:
+
+#代码填写区
+dt_clf1 = DecisionTreeClassifier()
+dt_clf1.fit(X,y)   
+
+Out [3]:
+
+DecisionTreeClassifier()
+
+2、定义函数画出决策树分类边界
+
+def plot_decision_boundary(model, axis): # model是模型，axis是范围    
+    x0, x1 = np.meshgrid(        
+        np.linspace(axis[0], axis[1],int((axis[1]-axis[0])*100)).reshape(-1,1),        
+        np.linspace(axis[2], axis[3],int((axis[3]-axis[2])*100)).reshape(-1,1),    
+    )    
+    X_new = np.c_[x0.ravel(), x1.ravel()]
+    ##
+    zz = y_predict.reshape(x0.shape)
+    custom_cmap = ListedColormap(['#EF9A9A','#FFF59D','#90CAF9'])        
+    plt.contourf(x0, x1, zz, cmap=custom_cmap)
+
+In [4]:
+
+#请在'##'处补充代码
+def plot_decision_boundary(model, axis): # model是模型，axis是范围    
+    x0, x1 = np.meshgrid(        
+        np.linspace(axis[0], axis[1],int((axis[1]-axis[0])*100)).reshape(-1,1),        
+        np.linspace(axis[2], axis[3],int((axis[3]-axis[2])*100)).reshape(-1,1),    
+    )    
+    X_new = np.c_[x0.ravel(), x1.ravel()]
+    y_predict = model.predict(X_new)    
+    zz = y_predict.reshape(x0.shape)
+      
+    custom_cmap = ListedColormap(['#EF9A9A','#FFF59D','#90CAF9'])        
+    plt.contourf(x0, x1, zz, cmap=custom_cmap)
+plot_decision_boundary(dt_clf1, axis=[-1.5,2.5,-1.0,1.5])
+plt.scatter(X[y==0,0],X[y==0,1])
+plt.scatter(X[y==1,0],X[y==1,1])
+plt.show()
+
+3、设置决策树的深度为2重新训练并显示决策边界
+
+##
+##
+##
+plt.scatter(X[y==0,0],X[y==0,1])
+plt.scatter(X[y==1,0],X[y==1,1])
+plt.show()
+
+In [5]:
+
+#请在'##'处补充代码
+dt_clf2 = DecisionTreeClassifier(max_depth=2)
+dt_clf2.fit(X,y)
+plot_decision_boundary(dt_clf2, axis=[-1.5,2.5,-1.0,1.5])
+plt.scatter(X[y==0,0],X[y==0,1])
+plt.scatter(X[y==1,0],X[y==1,1])
+plt.show()
+
+4、设置决策树设置最小样本叶节点为6重新训练并显示决策边界
+
+要求：对于一个叶子节点，至少有6个样本
+
+##
+##
+##
+plt.scatter(X[y==0,0],X[y==0,1])
+plt.scatter(X[y==1,0],X[y==1,1])
+plt.show()
+
+In [7]:
+
+#请在'##'处补充代码
+dt_clf3 = DecisionTreeClassifier(min_samples_leaf=6)
+dt_clf3.fit(X,y)
+plot_decision_boundary(dt_clf3, axis=[-1.5,2.5,-1.0,1.5])
+plt.scatter(X[y==0,0],X[y==0,1])
+plt.scatter(X[y==1,0],X[y==1,1])
+plt.show()
+
+In [ ]:
+

@@ -1,0 +1,27 @@
+
+请根据提示和要求完成代码填空
+
+题目类型：初始化神经网络的权重和偏置
+题目要求：对于一个神经网络，设计一个函数用来初始化网络中的所有层的权重和偏置，权重随机初始化，偏置初始化为零。函数名已经写好，如下所示。
+在下列代码填充区部分填入初始化权重和偏置的代码
+In [2]:
+
+def initialize_parameters_random(layers_dims):
+    """Arguments:
+    layer_dims -- python数组(list)，包含每个层的大小。
+
+    Returns:
+    parameters -- 包含参数的python字典 "W1", "b1", ..., "WL", "bL":
+                    W1 -- 形状权重矩阵()
+                    b1 -- 形状偏置向量()
+                    ...
+                    WL -- 形状权重矩阵()
+                    bL -- 形状的偏置向量()"""
+    parameters = {}
+    L = len(layers_dims)
+    ##代码填充区
+    for l in range(1, L):
+        parameters['W' + str(l)] = np.random.randn(layers_dims[l], layers_dims[l - 1]) * 10
+        parameters['b' + str(l)] = np.zeros((layers_dims[l], 1))   
+     ##代码填充区   
+    return parameters

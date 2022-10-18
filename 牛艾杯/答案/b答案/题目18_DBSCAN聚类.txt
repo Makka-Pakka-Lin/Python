@@ -1,0 +1,62 @@
+
+题目：请根据要求生成数据并对数据进行聚类。
+1、生成随机数据
+
+三簇数据，其中两组是非凸数据，即生成一个大圆和一个小圆，共5000个二维的点；另外生成1000个以（1.2，1.2）为中心的点。
+
+from sklearn import datasets
+import numpy as np
+X1, y1=datasets.make_circles(n_samples=10000, factor=.6,noise=.05)
+X2, y2 = datasets.make_blobs(n_samples=2000, n_features=2, centers=[[1.2,1.2]], cluster_std=[[.1]],
+               random_state=9)#生成1000个以（1.2，1.2）为中心的点
+X = np.concatenate((X1, X2))
+
+In [1]:
+
+#请在此处编写上面的代码，并将<None>处代码补充完整
+
+from sklearn import datasets
+import numpy as np
+X1, y1=datasets.make_circles(n_samples=10000, factor=.6,
+                                      noise=.05)#生成一个大圆和一个小圆，共5000个二维的点
+X2, y2 = datasets.make_blobs(n_samples=2000, n_features=2, centers=[[1.2,1.2]], cluster_std=[[.1]],
+               random_state=9)#生成1000个以（1.2，1.2）为中心的点
+
+X = np.concatenate((X1, X2))
+
+2、画出上述数据的散点图
+
+请在下方代码的基础上将<None>处代码补充完整。
+
+import matplotlib.pyplot as plt
+<None>
+plt.show()
+
+In [2]:
+
+#请在此处编写上面的代码，并将<None>处代码补充完整
+
+import matplotlib.pyplot as plt
+plt.scatter(X[:, 0], X[:, 1], marker='o')
+plt.show()
+
+3、使用DBSCAN算法对数据进行聚类并展示
+
+请在下方代码的基础上将<None>处代码补充完整，完成聚类和显示。
+
+from sklearn.cluster import DBSCAN
+<None>
+<None>
+plt.show()
+
+In [3]:
+
+#请在此处编写上面的代码，并将<None>处代码补充完整
+
+from sklearn.cluster import DBSCAN
+y_pred = DBSCAN(eps = 0.1, min_samples = 20).fit_predict(X)
+plt.scatter(X[:, 0], X[:, 1], c=y_pred)
+plt.show()
+
+In [ ]:
+

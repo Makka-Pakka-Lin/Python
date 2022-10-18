@@ -1,0 +1,149 @@
+
+题目
+
+请使用给定数据集'DataSetReadOnly/testSet.txt'，按步骤要求完成逻辑回归二分类。
+1、读取数据
+
+import numpy as np
+def loadDataSet():
+    dataMat = []
+    labelMat = []
+    fr = open('DataSetReadOnly/testSet.txt')
+    for line in fr.readlines():
+        lineArr = line.strip().split()
+        ##
+        ##
+    fr.close()
+    return dataMat, labelMat
+dataMat, labelMat = loadDataSet()
+
+In [1]:
+
+# 请在'##'处补充代码
+import numpy as np
+def loadDataSet():
+    dataMat = []
+    labelMat = []
+    fr = open('DataSetReadOnly/testSet.txt')
+    for line in fr.readlines():
+        lineArr = line.strip().split()
+        dataMat.append([1.0, float(lineArr[0]), float(lineArr[1])])
+        labelMat.append(int(lineArr[2]))
+    fr.close()
+    return dataMat, labelMat
+dataMat, labelMat = loadDataSet()
+
+2、 定义sigmoid函数
+
+def sigmoid(inX):
+    ##
+
+In [2]:
+
+# 请在'##'处补充代码
+def sigmoid(inX):
+    return 1.0/(1+np.exp(-inX))
+
+3、定义随机梯度下降函数，训练权重并输出
+
+def stocGradAscent1(dataMatrix, classLabels, numIter=150):
+    m, n = np.shape(dataMatrix)
+    weights = np.ones(n)  
+    for j in range(numIter):
+        dataIndex = list(range(m))  
+        for i in range(m):
+            alpha = 4/(1.0+j+i)+0.0001
+            randIndex = int(np.random.uniform(0, len(dataIndex)))
+            h = sigmoid(sum(dataMatrix[randIndex]*weights))
+            error = classLabels[randIndex] - h
+            ##
+            ##
+    return weights
+
+In [3]:
+
+# 请在'##'处补充代码
+def stocGradAscent1(dataMatrix, classLabels, numIter=150):
+    m, n = np.shape(dataMatrix)
+    weights = np.ones(n)  
+    for j in range(numIter):
+        dataIndex = list(range(m)) 
+        for i in range(m):
+            alpha = 4/(1.0+j+i)+0.0001
+            randIndex = int(np.random.uniform(0, len(dataIndex)))
+            h = sigmoid(sum(dataMatrix[randIndex]*weights))
+            error = classLabels[randIndex] - h
+            weights = weights + alpha * error * dataMatrix[randIndex]
+            del(dataIndex[randIndex])
+    return weights
+weights = stocGradAscent1(np.array(dataMat), labelMat, 20)
+weights
+
+Out [3]:
+
+array([10.63035339,  0.70217805, -1.61754633])
+
+4、 绘制二分直线
+
+import matplotlib.pyplot as plt
+def plotBestFit(weights):
+    dataMat, labelMat = loadDataSet()
+    dataArr = np.array(dataMat)
+    n = np.shape(dataArr)[0]
+    xcord1 = []
+    ycord1 = []
+    xcord2 = []
+    ycord2 = []
+    for i in range(n):
+        if int(labelMat[i]) == 1:
+            xcord1.append(dataArr[i, 1])
+            ycord1.append(dataArr[i, 2])
+        else:
+            xcord2.append(dataArr[i, 1])
+            ycord2.append(dataArr[i, 2])
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.scatter(xcord1, ycord1, s=30, c='red', marker='s')
+    ax.scatter(xcord2, ycord2, s=30, c='green')
+    ## x = 
+    ## y = 
+    ax.plot(x, y)
+    ax.set_xlabel('X1')
+    ax.set_ylabel('X2')
+    plt.show()
+plotBestFit(weights)
+
+In [4]:
+
+# 请在'##'处补充代码
+def plotBestFit(weights):
+    import matplotlib.pyplot as plt
+    # weights = wei.getA()  # 转换成array数组
+    dataMat, labelMat = loadDataSet()
+    dataArr = np.array(dataMat)
+    n = np.shape(dataArr)[0]
+    xcord1 = []
+    ycord1 = []
+    xcord2 = []
+    ycord2 = []
+    for i in range(n):
+        if int(labelMat[i]) == 1:
+            xcord1.append(dataArr[i, 1])
+            ycord1.append(dataArr[i, 2])
+        else:
+            xcord2.append(dataArr[i, 1])
+            ycord2.append(dataArr[i, 2])
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.scatter(xcord1, ycord1, s=30, c='red', marker='s')
+    ax.scatter(xcord2, ycord2, s=30, c='green')
+    x = np.arange(-3.0, 3.0, 0.1)
+    y = (-weights[0]-weights[1]*x)/weights[2]  # y是x2,x是x1,基于w0+w1*x1+w2*x2=0
+    ax.plot(x, y)
+    ax.set_xlabel('X1')
+    ax.set_ylabel('X2')
+    plt.show()
+plotBestFit(weights)
+
+In [ ]:
+

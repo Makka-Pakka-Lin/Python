@@ -1,0 +1,48 @@
+导入需要使用的包
+In [3]:
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+In [4]:
+
+path =  './DataSetReadOnly/ex1data1.txt'
+data = pd.read_csv(path, header=None, names=['Population', 'Profit'])
+data.head()  #预览数据
+
+Out [4]:
+In [5]:
+
+data.plot(kind='scatter', x='Population', y='Profit', figsize=(12,8))
+plt.show()
+
+In [6]:
+
+# set X (training data) and y (target variable)
+cols = data.shape[1]
+X = data.iloc[:,0:cols-1]#X是所有行，去掉最后一列
+y = data.iloc[:,cols-1:cols]#X是所有行，最后一列
+
+normal equation（正规方程）
+
+正规方程是通过求解下面的方程来找出使得代价函数最小的参数的：∂∂θjJ(θj)=0\frac{\partial }{\partial {{\theta }{j}}}J\left( {{\theta }{j}} \right)=0∂θj​∂​J(θj​)=0 。 假设我们的训练集特征矩阵为 X（包含了x0=1{{x}_{0}}=1x0​=1）并且我们的训练集结果为向量 y，则利用正规方程解出向量 θ=(XTX)−1XTy\theta ={{\left( {{X}^{T}}X \right)}^{-1}}{{X}^{T}}yθ=(XTX)−1XTy 。 上标T代表矩阵转置，上标-1 代表矩阵的逆。设矩阵A=XTXA={{X}^{T}}XA=XTX，则：(XTX)−1=A−1{{\left( {{X}^{T}}X \right)}^{-1}}={{A}^{-1}}(XTX)−1=A−1
+
+梯度下降与正规方程的比较：
+
+梯度下降：需要选择学习率α，需要多次迭代，当特征数量n大时也能较好适用，适用于各种类型的模型
+
+正规方程：不需要选择学习率α，一次计算得出，需要计算(XTX)−1{{\left( {{X}^{T}}X \right)}^{-1}}(XTX)−1，如果特征数量n较大则运算代价大，因为矩阵逆的计算时间复杂度为O(n3)O(n3)O(n3)，通常来说当nnn小于10000 时还是可以接受的，只适用于线性模型，不适合逻辑回归模型等其他模型
+In [8]:
+
+# 正规方程
+def normalEqn(X, y):
+    theta = np.linalg.inv(X.T@X)@X.T@y
+    return theta
+
+In [9]:
+
+final_theta2=normalEqn(X, y)#感觉和批量梯度下降的theta的值有点差距
+final_theta2
+
+Out [9]:

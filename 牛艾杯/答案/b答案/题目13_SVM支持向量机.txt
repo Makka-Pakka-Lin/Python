@@ -1,0 +1,379 @@
+
+题目：将代码中的缺失部分填充完整。
+
+在初始化参数 theta 中，你会看到如 下的代码： theta = None 这里，大家只需要删除赋值等式右边的 None，修改为自己编写的表达式即可。
+
+我们将使用支持向量机（SVM）来构建垃圾邮件分类器。 我们将从一些简单的2D数据集开始使用SVM来查看它们的工作原理。 然后，我们将对一组原始电子邮件进行一些预处理工作，并使用SVM在处理的电子邮件上构建分类器，以确定它们是否为垃圾邮件。
+
+我们要做的第一件事是看一个简单的二维数据集，看看线性SVM如何对数据集进行不同的C值（类似于线性/逻辑回归中的正则化项）。
+In [3]:
+
+!unrar e ./DataSetReadOnly/data.rar
+
+
+UNRAR 5.71 freeware      Copyright (c) 1993-2019 Alexander Roshal
+
+
+Extracting from ./DataSetReadOnly/data.rar
+
+Extracting  emailSample1.txt                                             0  OK 
+Extracting  emailSample2.txt                                             0  OK 
+Extracting  ex6data1.mat                                                 0  OK 
+Extracting  ex6data2.mat                                                 1  OK 
+Extracting  ex6data3.mat                                                 2  OK 
+Extracting  spamSample1.txt                                              2  OK 
+Extracting  spamSample2.txt                                              2  OK 
+Extracting  spamTest.mat                                                  1 2 22  OK 
+Extracting  spamTrain.mat                                               2 3 4 4 5 5 6 6 7 8 8 9 98  OK 
+Extracting  vocab.txt                                                   99  OK 
+All OK
+
+In [4]:
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sb
+from scipy.io import loadmat
+
+raw_data = loadmat('./ex6data1.mat')
+raw_data
+
+Out [4]:
+
+{'__header__': b'MATLAB 5.0 MAT-file, Platform: GLNXA64, Created on: Sun Nov 13 14:28:43 2011',
+ '__version__': '1.0',
+ '__globals__': [],
+ 'X': array([[1.9643  , 4.5957  ],
+        [2.2753  , 3.8589  ],
+        [2.9781  , 4.5651  ],
+        [2.932   , 3.5519  ],
+        [3.5772  , 2.856   ],
+        [4.015   , 3.1937  ],
+        [3.3814  , 3.4291  ],
+        [3.9113  , 4.1761  ],
+        [2.7822  , 4.0431  ],
+        [2.5518  , 4.6162  ],
+        [3.3698  , 3.9101  ],
+        [3.1048  , 3.0709  ],
+        [1.9182  , 4.0534  ],
+        [2.2638  , 4.3706  ],
+        [2.6555  , 3.5008  ],
+        [3.1855  , 4.2888  ],
+        [3.6579  , 3.8692  ],
+        [3.9113  , 3.4291  ],
+        [3.6002  , 3.1221  ],
+        [3.0357  , 3.3165  ],
+        [1.5841  , 3.3575  ],
+        [2.0103  , 3.2039  ],
+        [1.9527  , 2.7843  ],
+        [2.2753  , 2.7127  ],
+        [2.3099  , 2.9584  ],
+        [2.8283  , 2.6309  ],
+        [3.0473  , 2.2931  ],
+        [2.4827  , 2.0373  ],
+        [2.5057  , 2.3853  ],
+        [1.8721  , 2.0577  ],
+        [2.0103  , 2.3546  ],
+        [1.2269  , 2.3239  ],
+        [1.8951  , 2.9174  ],
+        [1.561   , 3.0709  ],
+        [1.5495  , 2.6923  ],
+        [1.6878  , 2.4057  ],
+        [1.4919  , 2.0271  ],
+        [0.962   , 2.682   ],
+        [1.1693  , 2.9276  ],
+        [0.8122  , 2.9992  ],
+        [0.9735  , 3.3881  ],
+        [1.25    , 3.1937  ],
+        [1.3191  , 3.5109  ],
+        [2.2292  , 2.201   ],
+        [2.4482  , 2.6411  ],
+        [2.7938  , 1.9656  ],
+        [2.091   , 1.6177  ],
+        [2.5403  , 2.8867  ],
+        [0.9044  , 3.0198  ],
+        [0.76615 , 2.5899  ],
+        [0.086405, 4.1045  ]]),
+ 'y': array([[1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [1],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [1]], dtype=uint8)}
+
+我们将其用散点图表示，其中类标签由符号表示（+表示正类，o表示负类）。
+In [5]:
+
+data = pd.DataFrame(raw_data['X'], columns=['X1', 'X2'])
+data['y'] = raw_data['y']
+
+positive = data[data['y'].isin([1])]
+negative = data[data['y'].isin([0])]
+
+fig, ax = plt.subplots(figsize=(12,8))
+ax.scatter(positive['X1'], positive['X2'], s=50, marker='x', label='Positive')
+ax.scatter(negative['X1'], negative['X2'], s=50, marker='o', label='Negative')
+ax.legend()
+plt.show()
+
+请注意，还有一个异常的正例在其他样本之外。 这些类仍然是线性分离的，但它非常紧凑。 我们要训练线性支持向量机来学习类边界。 在这个练习中，我们没有从头开始执行SVM的任务，所以我要用scikit-learn。
+In [6]:
+
+from sklearn import svm
+svc = svm.LinearSVC(C=1, loss='hinge', max_iter=1000)
+svc
+
+Out [6]:
+
+LinearSVC(C=1, loss='hinge')
+
+首先，我们使用 C=1 看下结果如何。
+In [7]:
+
+svc.fit(data[['X1', 'X2']], data['y'])
+svc.score(data[['X1', 'X2']], data['y'])
+
+/usr/local/lib/python3.8/site-packages/sklearn/svm/_base.py:985: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn("Liblinear failed to converge, increase "
+
+Out [7]:
+
+0.9803921568627451
+
+其次，让我们看看如果C的值越大，会发生什么
+In [8]:
+
+svc2 = svm.LinearSVC(C=100, loss='hinge', max_iter=1000)
+svc2.fit(data[['X1', 'X2']], data['y'])
+svc2.score(data[['X1', 'X2']], data['y'])
+
+/usr/local/lib/python3.8/site-packages/sklearn/svm/_base.py:985: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn("Liblinear failed to converge, increase "
+
+Out [8]:
+
+0.9803921568627451
+
+这次我们得到了训练数据的完美分类，但是通过增加C的值，我们创建了一个不再适合数据的决策边界。 我们可以通过查看每个类别预测的置信水平来看出这一点，这是该点与超平面距离的函数。
+In [9]:
+
+data['SVM 1 Confidence'] = svc.decision_function(data[['X1', 'X2']])
+
+fig, ax = plt.subplots(figsize=(12,8))
+ax.scatter(data['X1'], data['X2'], s=50, c=data['SVM 1 Confidence'], cmap='seismic')
+ax.set_title('SVM (C=1) Decision Confidence')
+plt.show()
+
+In [10]:
+
+data['SVM 2 Confidence'] = svc2.decision_function(data[['X1', 'X2']])
+
+fig, ax = plt.subplots(figsize=(12,8))
+ax.scatter(data['X1'], data['X2'], s=50, c=data['SVM 2 Confidence'], cmap='seismic')
+ax.set_title('SVM (C=100) Decision Confidence')
+plt.show()
+
+可以看看靠近边界的点的颜色，区别是有点微妙。 如果您在练习文本中，则会出现绘图，其中决策边界在图上显示为一条线，有助于使差异更清晰。
+
+现在我们将从线性SVM转移到能够使用内核进行非线性分类的SVM。 我们首先负责实现一个高斯核函数。 虽然scikit-learn具有内置的高斯内核，但为了实现更清楚，我们将从头开始实现。
+In [11]:
+
+def gaussian_kernel(x1, x2, sigma=0.1):
+    x1 = x1.flatten()
+    x2 = x2.flatten()
+
+    sim = 0
+
+    sim = np.exp(-np.sum(np.power((x1 - x2), 2)) / (2 * np.power(sigma,2)))
+
+    return sim
+
+In [12]:
+
+x1 = np.array([1.0, 2.0, 1.0])
+x2 = np.array([0.0, 4.0, -1.0])
+sigma = 2
+
+gaussian_kernel(x1, x2, sigma)
+
+Out [12]:
+
+0.32465246735834974
+
+如果你的程序正确，这里的输出应该是0.32465246735834974
+In [13]:
+
+raw_data = loadmat('./ex6data2.mat')
+
+data = pd.DataFrame(raw_data['X'], columns=['X1', 'X2'])
+data['y'] = raw_data['y']
+
+positive = data[data['y'].isin([1])]
+negative = data[data['y'].isin([0])]
+
+fig, ax = plt.subplots(figsize=(12,8))
+ax.scatter(positive['X1'], positive['X2'], s=30, marker='x', label='Positive')
+ax.scatter(negative['X1'], negative['X2'], s=30, marker='o', label='Negative')
+ax.legend()
+plt.show()
+
+对于该数据集，我们将使用内置的RBF内核构建支持向量机分类器，并检查其对训练数据的准确性。 为了可视化决策边界，这一次我们将根据实例具有负类标签的预测概率来对点做阴影。 从结果可以看出，它们大部分是正确的。
+In [14]:
+
+svc = svm.SVC(C=100, gamma=10, probability=True)
+svc
+
+Out [14]:
+
+SVC(C=100, gamma=10, probability=True)
+
+In [15]:
+
+svc.fit(data[['X1', 'X2']], data['y'])
+svc.score(data[['X1', 'X2']], data['y'])
+
+Out [15]:
+
+0.9698725376593279
+
+In [16]:
+
+data['Probability'] = svc.predict_proba(data[['X1', 'X2']])[:,0]
+
+fig, ax = plt.subplots(figsize=(12,8))
+ax.scatter(data['X1'], data['X2'], s=30, c=data['Probability'], cmap='Reds')
+plt.show()
+
+对于第三个数据集，我们给出了训练和验证集，并且基于验证集性能为SVM模型找到最优超参数。 虽然我们可以使用scikit-learn的内置网格搜索来做到这一点，但是本着遵循练习的目的，我们将从头开始实现一个简单的网格搜索。
+In [17]:
+
+raw_data = loadmat('./ex6data3.mat')
+
+X = raw_data['X']
+Xval = raw_data['Xval']
+y = raw_data['y'].ravel()
+yval = raw_data['yval'].ravel()
+
+#设置可选的超参数
+C_values = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100]
+gamma_values = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100]
+
+best_score = 0
+best_params = {'C':None, 'gamma':None}
+for c in C_values:
+    for gamma in gamma_values:
+        svc = svm.SVC(C=c, gamma=gamma, probability=True)  
+        svc.fit(data[['X1', 'X2']], data['y']) # 用训练集训练
+        score =  svc.score(Xval, yval)  # 用验证集选优
+        if score > best_score:
+            best_score = score
+            best_params['C'] = c
+            best_params['gamma'] = gamma
+best_score, best_params
+
+Out [17]:
+
+(0.84, {'C': 3, 'gamma': 0.1})
+
+如果代码正确，这里的输出应该是：(0.96499999999999997, {'C': 0.3, 'gamma': 100})
+
+现在，我们将进行第二部分的练习。 在这一部分中，我们的目标是使用SVM来构建垃圾邮件过滤器。 在练习文本中，有一个任务涉及一些文本预处理，以获得适合SVM处理的格式的数据。 然而，这个任务很简单（将字词映射到为练习提供的字典中的ID），而其余的预处理步骤（如HTML删除，词干，标准化等）已经完成。 我将跳过机器学习任务，而不是重现这些预处理步骤，其中包括从预处理过的训练集构建分类器，以及将垃圾邮件和非垃圾邮件转换为单词出现次数的向量的测试数据集。
+In [18]:
+
+spam_train = loadmat('./spamTrain.mat')
+spam_test = loadmat('./spamTest.mat')
+
+spam_train
+
+Out [18]:
+
+{'__header__': b'MATLAB 5.0 MAT-file, Platform: GLNXA64, Created on: Sun Nov 13 14:27:25 2011',
+ '__version__': '1.0',
+ '__globals__': [],
+ 'X': array([[0, 0, 0, ..., 0, 0, 0],
+        [0, 0, 0, ..., 0, 0, 0],
+        [0, 0, 0, ..., 0, 0, 0],
+        ...,
+        [0, 0, 0, ..., 0, 0, 0],
+        [0, 0, 1, ..., 0, 0, 0],
+        [0, 0, 0, ..., 0, 0, 0]], dtype=uint8),
+ 'y': array([[1],
+        [1],
+        [0],
+        ...,
+        [1],
+        [0],
+        [0]], dtype=uint8)}
+
+In [19]:
+
+# TODO： 获取训练和测试数据，这里应注意把标签y矩阵拉直
+X = spam_train['X']
+Xtest = spam_test['Xtest']
+
+y = spam_train['y'].ravel()
+ytest = spam_test['ytest'].ravel()
+
+X.shape, y.shape, Xtest.shape, ytest.shape
+
+Out [19]:
+
+((4000, 1899), (4000,), (1000, 1899), (1000,))
+
+如果你的代码正确，这里输出的应该是((4000, 1899), (4000,), (1000, 1899), (1000,))
+
+每个文档已经转换为一个向量，其中1,899个维对应于词汇表中的1,899个单词。 它们的值为二进制，表示文档中是否存在单词。 在这一点上，训练评估是用一个分类器拟合测试数据的问题。
+In [20]:
+
+svc = svm.SVC()
+svc.fit(X, y)
+print('Training accuracy = {0}%'.format(np.round(svc.score(X, y) * 100, 2)))
+
+Training accuracy = 99.32%
+

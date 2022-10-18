@@ -1,0 +1,101 @@
+
+题目：按照要求创建带有LSTM单元的网络
+
+LSTM是循环神经网络的变体，LSTM是利用门控制结构决定在某一时刻让网络有选择“重要的信息”通过神经网络，也就是让信息有选择性的影响模型不同时刻的状态，门控制结构是通过sigmoid函数和矩阵点乘的计算来实现的。sigmoid函数可以输出0-1之间的数，可以通过这个数来描述当前让多少信息通过这个结构，当sigmoid函数的输出为1，则表示门是“打开”的，所有的信息都能通过，如果输出为0，则表示门“关闭”，则没有信息可以通过。整个LSTM单元的计算过程相当于上一个时刻的状态Ct-1经过一个sigmoid函数乘上一个系数，然后线性叠加上现在时刻的状态信息，最后输出最新状态的信息。
+
+LSTM的网络结构示意图如下所示: image.png
+1.向网络中添加第一个LSTM层
+
+要求：请在下方代码的基础上将<None>处代码补充完整，构建第一个LSTM层，输入的维度为1，输出的维度为50，该层返回全部的hidden state的值。
+
+#请在此处编写代码
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation, Dropout, LSTM
+model=Sequential()
+<None>
+
+In [1]:
+
+#请在此处编写上面的代码，并将<None>处代码补充完整
+
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation, Dropout, LSTM
+model=Sequential()
+model.add(LSTM(input_dim=1,units=50,return_sequences=True))
+
+2.向网络中添加第二个LSTM层
+
+要求：请在下方代码的基础上将<None>处代码补充完整，构建第二个LSTM层，输入的维度为50，输出的维度为100，该层返回全部的隐藏层（hidden state）的值。
+
+model.add(<None>)
+
+In [2]:
+
+#请在此处编写代码，将<None>处代码补充完整
+
+
+model.add(LSTM(input_dim=50,units=100,return_sequences=True))
+
+3.向网络中添加最后一个LSTM层
+
+要求：请在下方代码的基础上将<None>处代码补充完整，构建最后一个LSTM层，输出的维度为300，该层只返回当前层的值。
+
+<None>
+
+In [3]:
+
+#请在此处编写代码，将<None>处代码补充完整
+
+model.add(LSTM(300, return_sequences=False))
+
+4.向网络中添加两个全连接层
+
+要求：请在下方代码的基础上将<None>处代码补充完整，构建两个全连接层，第一个全连接层有100个神经元，第二个有10个神经元
+
+#请在此处编写代码
+model.add(<None>)
+model.add(<None>)
+
+In [4]:
+
+#请在此处编写上面代码，并将<None>处代码补充完整
+
+model.add(Dense(100))
+model.add(Dense(10))
+
+5.输出该模型各层的参数情况
+
+要求：请在下方代码的基础上将<None>处代码补充完整，输出各层的参数情况
+
+#请在此处编写代码
+model.<None>()
+
+In [5]:
+
+#请在此处编写上面代码，并将<None>处代码补充完整
+model.summary()
+
+Model: "sequential"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+lstm (LSTM)                  (None, None, 50)          10400     
+_________________________________________________________________
+lstm_1 (LSTM)                (None, None, 100)         60400     
+_________________________________________________________________
+lstm_2 (LSTM)                (None, 300)               481200    
+_________________________________________________________________
+dense (Dense)                (None, 100)               30100     
+_________________________________________________________________
+dense_1 (Dense)              (None, 10)                1010      
+=================================================================
+Total params: 583,110
+Trainable params: 583,110
+Non-trainable params: 0
+_____________________________
