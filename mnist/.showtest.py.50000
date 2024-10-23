@@ -1,0 +1,6 @@
+import cv2
+from cvs import *
+ 
+cap = cvs.VideoCapture("22.jpg")
+img = cap.read()
+cap.imshow(img)

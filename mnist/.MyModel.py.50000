@@ -1,0 +1,71 @@
+import numpy as np
+import tensorflow as tf
+import cv2 as cv
+from PIL import Image
+from tensorflow.keras.preprocessing import image
+import matplotlib.pyplot as plt
+
+from picture import *
+#设置模型需要的宽高
+height       = 28
+width        = 28
+channels     = 3
+
+#读取标签文件，返回列表
+def read_label_list():
+    with open('label.txt', 'r',encoding="utf8") as f:
+        data = f.read().splitlines()
+    return data
+ 
+# Load TFLite model and allocate tensors.
+tflite_model = tf.lite.Interpreter(model_path="best.tflite")
+tflite_model.allocate_tensors()
+ 
+# Get input and output tensors.
+input_details = tflite_model.get_input_details()
+output_details = tflite_model.get_output_details()
+
+#print(input_details)
+#print(output_details)
+
+# Test model on random input data.
+input_shape = input_details[0]['shape']
+#input_data = np.array(np.random.random_sample(input_shape), dtype=np.float32)#输入随机数
+
+cv2.imwrite("77.jpg",bit_img)
+image_path_test = '77.jpg'
+#显示要预测的图片
+# def preprocess_img(image1):
+#     image1 = tf.image.decode_jpeg(image1,channels)
+#     image1 = tf.image.resize(image1,[width,height])
+#     image1 /= 255.0
+#     return image1
+# def load_and_preprocess_image(path):
+#     image1 = tf.io.read_file(path)
+#     return preprocess_img(image1)
+# image_show = load_and_preprocess_image(image_path_test)
+# plt.imshow(image_show)
+
+#加载图片至内存中并resize和增加维度
+img = image.load_img(image_path_test, target_size=(height, width))
+img = image.img_to_array(img)
+img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+img = np.expand_dims(img, 2)
+
+#print(img.shape)#这里直接打印将img转换为数组后的数据维度 (128,128,3)
+img = np.expand_dims(img, axis=0)#因为模型的输入是要求四维的，所以我们需要将输入图片增加一个维度，使用 expand_dims接口
+#print(img.shape)
+#print(img)
+
+tflite_model.set_tensor(input_details[0]['index'], img)
+tflite_model.invoke()
+
+output_data = tflite_model.get_tensor(output_details[0]['index'])
+#print(output_data)
+
+#标签预测
+#print(read_label_list())
+w = np.argmax(output_data)#值最大的位置
+lable_list = read_label_list()#读取标签列表
+print(lable_list[w])
+
